@@ -34,7 +34,7 @@ public class StudentController {
         return service.findByName(name);
     }
 
-    // Xem chi tiết sinh viên (DÙNG CHO NÚT "XEM CHI TIẾT")
+    // Xem chi tiết sinh viên
     @GetMapping("/{id}")
     public Student getStudentById(@PathVariable int id) {
         return service.getStudentById(id);
@@ -46,10 +46,12 @@ public class StudentController {
         return service.getAll();
     }
 
-    // Cập nhật sinh viên
+    // ✅ CẬP NHẬT SINH VIÊN (ĐÃ SỬA)
     @PutMapping("/{id}")
-    public Student updateStudent(int id, Student student) {
-        throw new RuntimeException("TEST UPDATE");
+    public Student updateStudent(
+            @PathVariable int id,
+            @RequestBody Student student) {
+
+        return service.updateStudent(id, student);
     }
-    
 }
