@@ -42,7 +42,10 @@ public class StudentService {
         if (existing == null) return null;
 
         existing.setName(student.getName());
+        existing.setAge(student.getAge());
         existing.setEmail(student.getEmail());
+        existing.setGender(student.getGender());
+        existing.setClassName(student.getClassName());
         existing.setImage(student.getImage());
 
         return repository.save(existing); // commit DB

@@ -2,162 +2,305 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý sinh viên</title>
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quan ly sinh vien</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        .student-thumb {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            background: #f8f9fa;
+        }
+        .detail-image {
+            width: 100%;
+            max-height: 320px;
+            object-fit: cover;
+        }
+    </style>
 </head>
-<body class="container mt-4">
+<body class="bg-light">
+<div class="container py-4">
+    <div id="listView">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Danh sach sinh vien</h2>
+        </div>
 
-<!-- ================= DANH SÁCH ================= -->
-<div id="listView">
-    <h3>DANH SÁCH SINH VIÊN</h3>
+        <input
+            type="text"
+            id="search"
+            class="form-control mb-3"
+            placeholder="Tim theo ten..."
+            onkeyup="searchStudent()"
+        >
 
-    <input type="text" id="search" class="form-control mb-3"
-           placeholder="Tìm theo tên..." onkeyup="searchStudent()">
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered table-hover align-middle bg-white">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Ten</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Class</th>
+                    <th>Email</th>
+                    <th>Hanh dong</th>
+                </tr>
+                </thead>
+                <tbody id="studentTable"></tbody>
+            </table>
+        </div>
 
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Tên</th>
-            <th>Email</th>
-            <th>Hành động</th>
-        </tr>
-        </thead>
-        <tbody id="studentTable"></tbody>
-    </table>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Them / Sua sinh vien</h4>
 
-    <h4>THÊM / SỬA SINH VIÊN</h4>
-    <input id="id" class="form-control mb-2" placeholder="ID (tự sinh)" readonly>
-    <input id="name" class="form-control mb-2" placeholder="Tên">
-    <input id="email" class="form-control mb-2" placeholder="Email">
-    <input id="image" class="form-control mb-2" placeholder="Tên ảnh (vd: sv1.jpg)">
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <input id="id" class="form-control" placeholder="ID" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <input id="name" class="form-control" placeholder="Ten sinh vien">
+                    </div>
+                    <div class="col-md-2">
+                        <input id="age" type="number" min="0" class="form-control" placeholder="Age">
+                    </div>
+                    <div class="col-md-4">
+                        <select id="gender" class="form-select">
+                            <option value="">Chon gender</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nu">Nu</option>
+                            <option value="Khac">Khac</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input id="className" class="form-control" placeholder="Class">
+                    </div>
+                    <div class="col-md-4">
+                        <input id="email" type="email" class="form-control" placeholder="Email">
+                    </div>
+                    <div class="col-md-4">
+                        <input id="image" class="form-control" placeholder="sv1.jpg hoac https://...">
+                    </div>
+                </div>
 
-    <button class="btn btn-primary" onclick="addStudent()">Thêm</button>
-    <button class="btn btn-warning" onclick="updateStudent()">Cập nhật</button>
-</div>
+                <p class="text-muted small mt-3 mb-3">
+                </p>
 
-<!-- ================= CHI TIẾT ================= -->
-<div id="detailView" style="display:none;">
-    <h3>CHI TIẾT SINH VIÊN</h3>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" onclick="addStudent()">Them</button>
+                    <button class="btn btn-warning" onclick="updateStudent()">Cap nhat</button>
+                    <button class="btn btn-outline-secondary" onclick="clearForm()">Lam moi</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="card" style="max-width: 400px;">
-        <img id="studentImage" class="card-img-top" alt="Ảnh sinh viên">
+    <div id="detailView" style="display: none;">
+        <h3 class="mb-3">Chi tiet sinh vien</h3>
 
-        <div class="card-body">
-            <p><b>ID:</b> <span id="d-id"></span></p>
-            <p><b>Tên:</b> <span id="d-name"></span></p>
-            <p><b>Email:</b> <span id="d-email"></span></p>
+        <div class="card shadow-sm mx-auto" style="max-width: 520px;">
+            <img id="studentImage" class="card-img-top detail-image" alt="Anh sinh vien" onerror="handleImageError(this)">
 
-            <button class="btn btn-secondary" onclick="backToList()">Quay lại</button>
+            <div class="card-body">
+                <p><b>ID:</b> <span id="d-id"></span></p>
+                <p><b>Ten:</b> <span id="d-name"></span></p>
+                <p><b>Age:</b> <span id="d-age"></span></p>
+                <p><b>Gender:</b> <span id="d-gender"></span></p>
+                <p><b>Class:</b> <span id="d-className"></span></p>
+                <p><b>Email:</b> <span id="d-email"></span></p>
+
+                <button class="btn btn-secondary" onclick="backToList()">Quay lai</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-const API = "http://localhost:8080/api/students";
+const API = "/api/students";
 
-const IMAGE_URL = "http://localhost:8080/images/";
+const listView = document.getElementById("listView");
+const detailView = document.getElementById("detailView");
+const studentTable = document.getElementById("studentTable");
+const searchInput = document.getElementById("search");
 
 const idInput = document.getElementById("id");
 const nameInput = document.getElementById("name");
+const ageInput = document.getElementById("age");
+const genderInput = document.getElementById("gender");
+const classNameInput = document.getElementById("className");
 const emailInput = document.getElementById("email");
 const imageInput = document.getElementById("image");
 
-function loadStudents() {
-    fetch(API)
-        .then(res => res.json())
-        .then(data => {
-            let html = "";
-            data.forEach(s => {
-                html += `
-                <tr>
-                    <td>${s.id}</td>
-                    <td>${s.name}</td>
-                    <td>${s.email}</td>
-                    <td>
-                        <button class="btn btn-success btn-sm"
-                            onclick="viewDetail(${s.id})">Xem</button>
-                        <button class="btn btn-info btn-sm"
-                            onclick="editStudent(${s.id}, '${s.name}', '${s.email}', '${s.image ?? ""}')">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                            onclick="deleteStudent(${s.id})">Xóa</button>
-                    </td>
-                </tr>`;
-            });
-            studentTable.innerHTML = html;
-        });
+function createPlaceholder(label = "No image") {
+    const safeLabel = escapeHtml(label);
+    const svg =
+        "<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'>" +
+        "<rect width='400' height='300' fill='#e9ecef'/>" +
+        `<text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#6c757d' font-size='24' font-family='Arial'>${safeLabel}</text>` +
+        "</svg>";
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-/* ========== THÊM (KHÔNG GỬI ID) ========== */
-function addStudent() {
-    const student = {
-        name: nameInput.value,
-        email: emailInput.value,
-        image: imageInput.value
+function resolveImageSrc(imageValue, studentName = "Student") {
+    if (!imageValue || !String(imageValue).trim()) {
+        return createPlaceholder(studentName);
+    }
+
+    const value = String(imageValue).trim();
+
+    if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("data:image")) {
+        return value;
+    }
+
+    if (value.startsWith("/")) {
+        return value;
+    }
+
+    if (value.startsWith("images/")) {
+        return `/${value}`;
+    }
+
+    return `/images/${value}`;
+}
+
+function handleImageError(img) {
+    img.onerror = null;
+    img.src = createPlaceholder(img.dataset.name || "No image");
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function displayValue(value) {
+    return value ?? "";
+}
+
+function getStudentFromForm() {
+    return {
+        name: nameInput.value.trim(),
+        age: ageInput.value ? Number(ageInput.value) : null,
+        gender: genderInput.value.trim(),
+        className: classNameInput.value.trim(),
+        email: emailInput.value.trim(),
+        image: imageInput.value.trim()
     };
+}
 
-    fetch(API, {
+function renderStudentRow(student) {
+    const studentId = Number(student.id);
+    const studentName = escapeHtml(student.name || "Student");
+    const imageSrc = escapeHtml(resolveImageSrc(student.image, student.name || "Student"));
+
+    return `
+        <tr>
+            <td>${displayValue(student.id)}</td>
+            <td>
+                <img
+                    src="${imageSrc}"
+                    alt="${studentName}"
+                    class="student-thumb"
+                    data-name="${studentName}"
+                    onerror="handleImageError(this)"
+                >
+            </td>
+            <td>${studentName}</td>
+            <td>${escapeHtml(displayValue(student.age))}</td>
+            <td>${escapeHtml(displayValue(student.gender))}</td>
+            <td>${escapeHtml(displayValue(student.className))}</td>
+            <td>${escapeHtml(displayValue(student.email))}</td>
+            <td>
+                <button class="btn btn-success btn-sm" onclick="viewDetail(${studentId})">Xem</button>
+                <button class="btn btn-info btn-sm" onclick="editStudent(${studentId})">Sua</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteStudent(${studentId})">Xoa</button>
+            </td>
+        </tr>
+    `;
+}
+
+async function loadStudents() {
+    const response = await fetch(API);
+    const data = await response.json();
+    studentTable.innerHTML = data.map(renderStudentRow).join("");
+}
+
+async function addStudent() {
+    await fetch(API, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(student)
-    }).then(() => {
-        clearForm();
-        loadStudents();
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(getStudentFromForm())
     });
+
+    clearForm();
+    await loadStudents();
 }
 
-/* ========== SỬA (GÁN ĐÚNG ID) ========== */
-function editStudent(sid, nameVal, emailVal, imageVal) {
-    idInput.value = sid;
-    nameInput.value = nameVal;
-    emailInput.value = emailVal;
-    imageInput.value = imageVal;
+async function editStudent(id) {
+    const response = await fetch(`${API}/${id}`);
+    const student = await response.json();
+
+    idInput.value = student.id ?? "";
+    nameInput.value = student.name ?? "";
+    ageInput.value = student.age ?? "";
+    genderInput.value = student.gender ?? "";
+    classNameInput.value = student.className ?? "";
+    emailInput.value = student.email ?? "";
+    imageInput.value = student.image ?? "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* ========== CẬP NHẬT ========== */
-function updateStudent() {
+async function updateStudent() {
     if (!idInput.value) {
-        alert("Chọn sinh viên cần sửa trước!");
+        alert("Chon sinh vien can sua truoc.");
         return;
     }
 
-    const student = {
-        name: nameInput.value,
-        email: emailInput.value,
-        image: imageInput.value
-    };
-
-    fetch(`${API}/${idInput.value}`, {
+    await fetch(`${API}/${idInput.value}`, {
         method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(student)
-    }).then(() => {
-        clearForm();
-        loadStudents();
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(getStudentFromForm())
     });
+
+    clearForm();
+    await loadStudents();
 }
 
-function deleteStudent(id) {
-    if (!confirm("Xóa sinh viên này?")) return;
+async function deleteStudent(id) {
+    if (!confirm("Xoa sinh vien nay?")) {
+        return;
+    }
 
-    fetch(`${API}/${id}`, { method: "DELETE" })
-        .then(() => loadStudents());
+    await fetch(`${API}/${id}`, { method: "DELETE" });
+    await loadStudents();
 }
 
-/* ========== XEM CHI TIẾT ========== */
-function viewDetail(id) {
-    fetch(`${API}/${id}`)
-        .then(res => res.json())
-        .then(s => {
-            listView.style.display = "none";
-            detailView.style.display = "block";
+async function viewDetail(id) {
+    const response = await fetch(`${API}/${id}`);
+    const student = await response.json();
 
-            document.getElementById("d-id").innerText = s.id;
-            document.getElementById("d-name").innerText = s.name;
-            document.getElementById("d-email").innerText = s.email;
-            studentImage.src = IMAGE_URL + (s.image ?? "default.png");
-        });
+    listView.style.display = "none";
+    detailView.style.display = "block";
+
+    document.getElementById("d-id").innerText = displayValue(student.id);
+    document.getElementById("d-name").innerText = displayValue(student.name);
+    document.getElementById("d-age").innerText = displayValue(student.age);
+    document.getElementById("d-gender").innerText = displayValue(student.gender);
+    document.getElementById("d-className").innerText = displayValue(student.className);
+    document.getElementById("d-email").innerText = displayValue(student.email);
+
+    const detailImage = document.getElementById("studentImage");
+    detailImage.dataset.name = student.name || "Student";
+    detailImage.src = resolveImageSrc(student.image, student.name || "Student");
 }
 
 function backToList() {
@@ -165,36 +308,30 @@ function backToList() {
     listView.style.display = "block";
 }
 
-function searchStudent() {
-    fetch(`${API}/search?name=${search.value}`)
-        .then(res => res.json())
-        .then(data => {
-            let html = "";
-            data.forEach(s => {
-                html += `
-                <tr>
-                    <td>${s.id}</td>
-                    <td>${s.name}</td>
-                    <td>${s.email}</td>
-                    <td>
-                        <button class="btn btn-success btn-sm"
-                            onclick="viewDetail(${s.id})">Xem</button>
-                    </td>
-                </tr>`;
-            });
-            studentTable.innerHTML = html;
-        });
+async function searchStudent() {
+    const keyword = searchInput.value.trim();
+
+    if (!keyword) {
+        await loadStudents();
+        return;
+    }
+
+    const response = await fetch(`${API}/search?name=${encodeURIComponent(keyword)}`);
+    const data = await response.json();
+    studentTable.innerHTML = data.map(renderStudentRow).join("");
 }
 
 function clearForm() {
     idInput.value = "";
     nameInput.value = "";
+    ageInput.value = "";
+    genderInput.value = "";
+    classNameInput.value = "";
     emailInput.value = "";
     imageInput.value = "";
 }
 
 loadStudents();
 </script>
-
 </body>
 </html>
